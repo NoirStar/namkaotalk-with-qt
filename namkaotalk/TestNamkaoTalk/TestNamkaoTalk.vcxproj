@@ -57,6 +57,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -114,11 +115,11 @@
     <ProjectReference Include="..\ChatClient\ChatClient.vcxproj">
       <Project>{24b6f912-f8fc-45e5-a503-0dd6712ee19b}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\ChatLibrary\ChatLibrary.vcxproj">
+      <Project>{2a2b9ed8-4ead-4997-a183-3acabc1d89a4}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\ChatServer\ChatServer.vcxproj">
       <Project>{538654b3-bb82-4141-a4cc-02237f95b7f6}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Utility\Utility.vcxproj">
-      <Project>{ea238e08-e640-45df-9765-b3b71f87c9c0}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
