@@ -5,8 +5,28 @@
 #include <utility>
 #include <stdexcept>
 #include <memory>
+#include <array>
+
+#pragma comment (lib, "ws2_32.lib")
 
 namespace network {
+
+class WsaInitializer {
+public:
+	WsaInitializer() {
+		WSADATA wsaData;
+		if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+			throw std::runtime_error("Failed to initialize Winsock");
+	}
+	~WsaInitializer() {
+		WSACleanup();
+	}
+
+	WsaInitializer(const WsaInitializer&) = delete;
+	WsaInitializer& operator=(const WsaInitializer&) = delete;
+	WsaInitializer(WsaInitializer&&) = delete;
+	WsaInitializer& operator=(WsaInitializer&&) = delete;
+};
 
 class WinSocket {
 
@@ -59,6 +79,17 @@ public:
 
 private:
 	WinSocket socket_;
+};
+
+struct IoContext {
+	OVERLAPPED overlapped{};
+	WSABUF wsabuf;
+	char data[4096]{};
+
+	IoContext() {
+		wsabuf.buf = data;
+		wsabuf.len = sizeof(data);
+	}
 };
 
 } // namespace network

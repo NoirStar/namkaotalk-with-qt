@@ -1,3 +1,2 @@
-﻿test.obj : error LNK2019: __imp_closesocket"public: __cdecl network::WinSocket::~WinSocket(void)" (??1WinSocket@network@@QEAA@XZ) 함수에서 참조되는 확인할 수 없는 외부 기호
-test.obj : error LNK2019: __imp_WSASocketW"public: __cdecl network::WinSocket::WinSocket(int,int,int,struct _WSAPROTOCOL_INFOW *,unsigned int,unsigned long)" (??0WinSocket@network@@QEAA@HHHPEAU_WSAPROTOCOL_INFOW@@IK@Z) 함수에서 참조되는 확인할 수 없는 외부 기호
-C:\Users\트리\Desktop\작업\NotWork\programming\qt\namkaotalk-with-qt\namkaotalk\x64\Debug\TestNamkaoTalk.exe : fatal error LNK1120: 2개의 확인할 수 없는 외부 참조입니다.
+﻿  test.cpp
+  TestNamkaoTalk.vcxproj -> C:\Users\트리\Desktop\작업\NotWork\programming\qt\namkaotalk-with-qt\namkaotalk\x64\Debug\TestNamkaoTalk.exe
