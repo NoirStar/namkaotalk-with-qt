@@ -11,85 +11,67 @@
 
 namespace network {
 
-class WsaInitializer {
-public:
-	WsaInitializer() {
-		WSADATA wsaData;
-		if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-			throw std::runtime_error("Failed to initialize Winsock");
-	}
-	~WsaInitializer() {
-		WSACleanup();
-	}
+constexpr int PORT = 8888;
+constexpr int BUFFER_SIZE = 1024;
 
-	WsaInitializer(const WsaInitializer&) = delete;
-	WsaInitializer& operator=(const WsaInitializer&) = delete;
-	WsaInitializer(WsaInitializer&&) = delete;
-	WsaInitializer& operator=(WsaInitializer&&) = delete;
+enum class IO_TYPE : int8_t {
+	RECV,
+	SEND,
+	COUNT
 };
 
-class WinSocket {
+struct OverlappedEx {
+	WSAOVERLAPPED overlapped{};
+	IO_TYPE ioType;
+	WSABUF wsabuf;
+	char buffer[BUFFER_SIZE]{};
 
+	explicit OverlappedEx(IO_TYPE t) : ioType(t) {
+		wsabuf.buf = buffer;
+		wsabuf.len = sizeof(buffer);
+	}
+};
+
+class SocketObject {
 public:
-	explicit WinSocket(int af, int type, int protocol, LPWSAPROTOCOL_INFOW lpProtocolInfo, GROUP g, DWORD dwFlags) {
-		socket_ = WSASocket(af, type, protocol, lpProtocolInfo, g, dwFlags);
+	SocketObject() : socket_(INVALID_SOCKET) {}
+	SocketObject(SOCKET socket) : socket_(socket) {
 		if (socket_ == INVALID_SOCKET) {
-			throw std::runtime_error("Failed to create socket");
+			throw std::runtime_error("Invalid socket");
 		}
-	};
-	~WinSocket() noexcept {
-		if (socket_ != INVALID_SOCKET)
-			closesocket(socket_);
-	};
+	}
 
-	WinSocket(const WinSocket&) = delete;
-	WinSocket& operator=(const WinSocket&) = delete;
-	WinSocket(WinSocket&& rhs) noexcept 
-		: socket_(std::exchange(rhs.socket_, INVALID_SOCKET)) {}
-	WinSocket& operator=(WinSocket&& rhs) noexcept {
-		if (this != &rhs) {
-			if (socket_ != INVALID_SOCKET)
+	~SocketObject() {
+		if (socket_ != INVALID_SOCKET) {
+			closesocket(socket_);
+		}
+	}
+
+	SocketObject(SocketObject&& other) noexcept
+		: socket_(std::exchange(other.socket_, INVALID_SOCKET)) {}
+	SocketObject& operator=(SocketObject&& other) noexcept {
+		if (this != &other) {
+			if (socket_ != INVALID_SOCKET) {
 				closesocket(socket_);
-			socket_ = std::exchange(rhs.socket_, INVALID_SOCKET);
+			}
+			socket_ = std::exchange(other.socket_, INVALID_SOCKET);
 		}
 		return *this;
 	}
 
-	SOCKET get() const noexcept { return socket_; }
+	SocketObject(const SocketObject&) = delete;
+	SocketObject& operator=(const SocketObject&) = delete;
 
-private:
-	SOCKET socket_ = INVALID_SOCKET;
-};
-
-class IocpSocket {
-public:
-	explicit IocpSocket(WinSocket socket) : socket_(std::move(socket)) {}
-	~IocpSocket() noexcept = default;
-
-	IocpSocket(const IocpSocket&) = delete;
-	IocpSocket& operator=(const IocpSocket&) = delete;
-	IocpSocket(IocpSocket&& rhs) noexcept = default;
-	IocpSocket& operator=(IocpSocket&& rhs) noexcept = default;
-
-	SOCKET get() const noexcept { return socket_.get(); }
-
-	void BindToIocp(HANDLE hIocp, ULONG_PTR key);
-	bool PostSend(WSABUF* buf, OVERLAPPED* overlapped);
-	bool PostRecv(WSABUF* buf, OVERLAPPED* overlapped);
-
-private:
-	WinSocket socket_;
-};
-
-struct IoContext {
-	OVERLAPPED overlapped{};
-	WSABUF wsabuf;
-	char data[4096]{};
-
-	IoContext() {
-		wsabuf.buf = data;
-		wsabuf.len = sizeof(data);
+	SOCKET get() const {
+		return socket_;
 	}
+
+	bool is_valid() const {
+		return socket_ != INVALID_SOCKET;
+	}
+
+private:
+	SOCKET socket_;
 };
 
 } // namespace network

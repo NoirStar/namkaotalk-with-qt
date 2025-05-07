@@ -5,22 +5,7 @@
 #include <iostream>
 
 // Testcase for ChatLibrary
-TEST(ChatLibraryTest, IocpSocket_CreateSocket) {
 
-	network::WsaInitializer wsaInitializer;
-
-	try {
-		network::IocpSocket iocpSocket{
-			network::WinSocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 
-				nullptr, 0, WSA_FLAG_OVERLAPPED)
-		};
-		EXPECT_NE(iocpSocket.get(), INVALID_SOCKET);
-
-	} catch (const std::exception& e) {
-		FAIL() << "Exception : " << e.what();
-	}
-
-}
 
 // Testcase for ThreadPool
 TEST(ThreadPoolTest, ThreadPool_ExcutionTest) {

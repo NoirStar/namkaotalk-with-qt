@@ -130,6 +130,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ChatServer.cpp" />
+    <ClCompile Include="ClientSession.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ChatServer.h" />
+    <ClInclude Include="ClientSession.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ChatLibrary\ChatLibrary.vcxproj">
+      <Project>{2a2b9ed8-4ead-4997-a183-3acabc1d89a4}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
