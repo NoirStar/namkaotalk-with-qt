@@ -10,13 +10,20 @@ public:
 
 	void RecvPacket();
 	void SendPacket(const char* data, size_t len);
-
+	void Echo(const char* data, size_t len);
 	// IOCP 비동기를 걸어준다.
 	void OnRecvCompleted(DWORD bytes);
 	void OnSendCompleted(DWORD bytes);
 
+	SOCKET GetSocket() const {
+		return socket_.get();
+	}
+
 private:
-	network::SocketObject socket_;
-	network::OverlappedEx recvOv_;
-	network::OverlappedEx sendOv_;
+
+	void Close();
+
+	network::ScopedSocket socket_;
+	std::unique_ptr<network::IoContext> recvCtx_;
+	std::unique_ptr<network::IoContext> sendCtx_;
 };

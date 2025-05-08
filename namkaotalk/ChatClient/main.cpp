@@ -11,6 +11,7 @@ int main() {
 
 		std::string message;
 		while (true) {
+			std::cout << "> ";
 			std::getline(std::cin, message);
 			if (message == "exit") break;
 

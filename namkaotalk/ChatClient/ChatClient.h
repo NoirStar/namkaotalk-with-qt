@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <array>
 #include "../ChatLibrary/network.h"
 
 class ChatClient {
@@ -11,7 +12,10 @@ public:
 	void RecvLoop();
 
 private:
-	network::SocketObject socket_;
+	network::WinSockInitializer wsaInitializer_;
+	network::ScopedSocket socket_;
 	std::wstring serverIp_;
 	int serverPort_;
+
+	std::array<char, network::BUFFER_SIZE> recvBuffer_{};
 };

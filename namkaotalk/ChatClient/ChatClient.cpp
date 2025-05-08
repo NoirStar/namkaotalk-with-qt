@@ -4,20 +4,19 @@
 #include <WS2tcpip.h>
 
 ChatClient::ChatClient(const std::wstring& ip, int port)
-	: serverIp_(ip), serverPort_(port) {
-	WSADATA wsaData;
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-		std::cerr << "[!] WSAStartup failed: " << WSAGetLastError() << std::endl;
-		throw std::runtime_error("WSAStartup failed");
-	}
+	: serverIp_(ip), serverPort_(port)
+	, wsaInitializer_() {
 }
 
 ChatClient::~ChatClient() {
-	WSACleanup();
 }
 
 void ChatClient::Connect() {
-	socket_ = network::SocketObject(socket(AF_INET, SOCK_STREAM, 0));
+	socket_ = network::ScopedSocket(socket(AF_INET, SOCK_STREAM, 0));
+	if (!socket_.is_valid()) {
+		std::cerr << "[!] Socket creation failed: " << WSAGetLastError() << std::endl;
+		throw std::runtime_error("Socket creation failed");
+	}
 
 	sockaddr_in serverAddr{};
 	serverAddr.sin_family = AF_INET;
@@ -43,14 +42,15 @@ void ChatClient::SendPacket(const std::string& msg) {
 }
 
 void ChatClient::RecvLoop() {
-	char buffer[network::BUFFER_SIZE];
 
 	while (true) {
-		int bytesReceived = recv(socket_.get(), buffer, sizeof(buffer), 0);
+
+		int bytesReceived = recv(socket_.get(), recvBuffer_.data(), recvBuffer_.size(), 0);
 		if (bytesReceived <= 0) {
 			std::cerr << "[!] Connection closed or error: " << WSAGetLastError() << std::endl;
 			break;
 		}
-		std::cout << "[+] Received: " << std::string(buffer, bytesReceived) << std::endl;
+
+		std::cout << "[+] Received: " << std::string(recvBuffer_.data(), bytesReceived) << std::endl;
 	}
 }
