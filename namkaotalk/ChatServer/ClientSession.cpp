@@ -45,6 +45,7 @@ void ClientSession::SendPacket(const char* data, size_t len) {
 
 	sendCtx_->reset();
 
+	std::memcpy(sendCtx_->buffer.data(), data, len);
 	sendCtx_->wsabuf.buf = sendCtx_->buffer.data();
 	sendCtx_->wsabuf.len = static_cast<ULONG>(len);
 
@@ -78,8 +79,9 @@ void ClientSession::OnRecvCompleted(DWORD bytes) {
 
 	std::cout << "[+] Received " << bytes << " bytes from client: "
 		<< socket_.get() << std::endl;
+
 	// Process received data
-	std::cout << "Data: " << recvCtx_->buffer.data() << std::endl;
+	std::cout << socket_.get() << ": " << std::string(recvCtx_->buffer.data(), bytes) << std::endl;
 
 
 	// 다시 비동기 수신을 걸어준다.
@@ -95,8 +97,8 @@ void ClientSession::OnSendCompleted(DWORD bytes) {
 		return;
 	}
 
-	std::cout << "[+] Sent " << bytes << " bytes to client: "
-		<< socket_.get() << std::endl;
+	//std::cout << "[+] Sent " << bytes << " bytes to client: "
+	//	<< socket_.get() << std::endl;
 }
 
 void ClientSession::Close() {

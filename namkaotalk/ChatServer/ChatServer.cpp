@@ -1,5 +1,7 @@
 ﻿#include "ChatServer.h"
 #include <iostream>
+#include <format>
+#include <string_view>
 #include <WinSock2.h>
 
 ChatServer::ChatServer(int port)
@@ -58,10 +60,12 @@ void ChatServer::Run() {
 }
 
 void ChatServer::Broadcast(const char* msg, size_t len, SOCKET senderSocket) {
+	const std::string_view messageView{ msg, len };
+	const std::string broadcastMsg = std::format("[{}]: {}\n", senderSocket, messageView);
 
-	for (auto& [sock, session] : clients_) {
+	for (const auto& [sock, session] : clients_) {
 		if (sock != senderSocket) {
-			session->SendPacket(msg, len);
+			session->SendPacket(broadcastMsg.data(), broadcastMsg.size());
 		}
 	}
 }

@@ -51,6 +51,6 @@ void ChatClient::RecvLoop() {
 			break;
 		}
 
-		std::cout << "[+] Received: " << std::string(recvBuffer_.data(), bytesReceived) << std::endl;
+		std::cout << std::string(recvBuffer_.data(), bytesReceived) << std::endl;
 	}
 }
